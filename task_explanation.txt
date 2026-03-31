@@ -1,0 +1,119 @@
+================================================================================
+PAYMENT RECONCILIATION PROJECT - TASK EXPLANATION
+================================================================================
+
+PROJECT TITLE: Books Balance Reconciliation System
+
+PROBLEM STATEMENT:
+A payments company's books don't balance at month end. They need to reconcile:
+- Transactions processed on their platform (recorded instantly when customer pays)
+- Actual settlements received from the bank (batched and settled 1-2 days later)
+
+At month end, every transaction SHOULD have a matching settlement, but they don't.
+
+OBJECTIVE:
+Find out WHY the books don't balance and show where the gaps are.
+
+================================================================================
+REQUIRED GAP TYPES (Test Data Anomalies to Plant):
+================================================================================
+
+1. LATE SETTLEMENT
+   - A transaction that was processed this month but settled in the FOLLOWING month
+   - This creates a timing mismatch between transaction record and settlement record
+
+2. ROUNDING DIFFERENCES
+   - A rounding error that only becomes visible when summed across multiple transactions
+   - May not show up in individual transaction comparisons
+   - Requires data aggregation to detect
+
+3. DUPLICATE ENTRY
+   - A transaction appears TWICE in one dataset (e.g., appears 2x in platform records)
+   - But only appears ONCE in the bank settlement
+   - Or vice versa
+   - Creates a count/amount mismatch
+
+4. ORPHANED REFUND
+   - A refund exists in one dataset
+   - But the original transaction it references does NOT exist in that dataset
+   - This breaks the transaction-refund pair matching logic
+
+================================================================================
+DELIVERABLES REQUIRED:
+================================================================================
+
+1. BRAINSTORMING THREAD
+   - Full LLM conversation (unedited, including wrong turns)
+   - This file will serve as that
+
+2. DISTILLED PROMPT
+   - The single optimal prompt fed into Claude/Cursor/AI tool
+   - Extract from chat history
+
+3. TEST CASES
+   - Verification tests that prove the solution works
+   - Test each gap type detection
+
+4. WORKING OUTPUT
+   - Deployed link (if applicable)
+   - Code zip file
+   - Demo video
+   - 3-sentence summary of what would fail in production
+
+5. ASSUMPTIONS
+   - Clearly state all assumptions made during the solution
+   - No right or wrong assumptions, just name them
+
+================================================================================
+DATA STRUCTURE ASSUMPTIONS (To Be Confirmed):
+================================================================================
+
+Platform Transactions Table:
+- transaction_id: unique identifier
+- amount: transaction amount
+- currency: currency code
+- transaction_date: when customer paid
+- status: (pending, settled, refunded)
+
+Bank Settlement Table:
+- settlement_id: unique identifier
+- transaction_id: reference to platform transaction
+- settled_amount: amount actually received
+- settlement_date: when bank processed it
+- status: (processed, pending)
+
+Refunds Table (if applicable):
+- refund_id: unique identifier
+- original_transaction_id: which transaction this refunds
+- refund_amount: amount refunded
+- refund_date: when refund was processed
+
+================================================================================
+TASK PHASES:
+================================================================================
+
+PHASE 1: Generate Test Data
+- Create sample transactions with all 4 gap types embedded
+- Document the intentional errors
+
+PHASE 2: Build Reconciliation Logic
+- Compare platform transactions with bank settlements
+- Detect and flag each type of gap
+- Generate reconciliation report
+
+PHASE 3: Identify and Report Gaps
+- List all mismatches with amounts
+- Show which gap type each one is
+- Calculate total reconciliation difference
+
+PHASE 4: Testing & Verification
+- Test that solution catches all 4 gap types
+- Verify accuracy of gap classification
+- Test with various data sizes
+
+PHASE 5: Documentation
+- Document assumptions made
+- Create demo showing the tool working
+- Note production limitations
+
+================================================================================
