@@ -51,9 +51,9 @@ export default function Dashboard() {
   const handleGenerateTestData = async () => {
     setLoading(true);
     const toastId = toast.loading("Generating test data...");
-    toast.loading(
+    const firebaseMsgId = toast.loading(
       "📡 Data is being stored in Firebase... This may take a moment",
-      { id: "firebase-msg" },
+      { duration: Infinity }, // Keep visible until manually dismissed
     );
     try {
       const testData = generateTestData();
@@ -82,7 +82,7 @@ export default function Dashboard() {
       }
 
       toast.success("Test data generated successfully! ✓", { id: toastId });
-      toast.dismiss("firebase-msg");
+      toast.success("✅ All data stored in Firebase!", { id: firebaseMsgId });
       setCurrentStep(2);
       await fetchStats();
     } catch (err) {
@@ -90,6 +90,7 @@ export default function Dashboard() {
       toast.error("Failed to generate test data: " + err.message, {
         id: toastId,
       });
+      toast.error("❌ Firebase storage failed", { id: firebaseMsgId });
     } finally {
       setLoading(false);
     }
@@ -99,6 +100,10 @@ export default function Dashboard() {
   const handleRunReconciliation = async () => {
     setLoading(true);
     const toastId = toast.loading("Running reconciliation...");
+    const processingId = toast.loading(
+      "⚙️ Processing data from Firebase... Please wait",
+      { duration: Infinity }, // Keep visible until manually dismissed
+    );
     try {
       toast.loading("Fetching transactions...", { id: toastId });
       const transactions = await firestoreService.getTransactions();
@@ -129,11 +134,13 @@ export default function Dashboard() {
       setReport(reportData);
       setCurrentStep(3);
       toast.success("Reconciliation completed! ✓", { id: toastId });
+      toast.success("✅ Report ready!", { id: processingId });
     } catch (err) {
       console.error("Error running reconciliation:", err);
       toast.error("Failed to run reconciliation: " + err.message, {
         id: toastId,
       });
+      toast.error("❌ Processing failed", { id: processingId });
     } finally {
       setLoading(false);
     }
